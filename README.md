@@ -1,0 +1,4 @@
+wallscript
+==========
+
+Simple Facebook WallScript 
