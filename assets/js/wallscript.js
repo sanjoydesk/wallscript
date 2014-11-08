@@ -1,4 +1,3 @@
-
 /**
  * @author : Sanjoy Dey
  * @url: www.appsntech.com
@@ -21,14 +20,14 @@ function submitComment()
     {
         $.ajax({
             type: 'post',
-            url: baseUrl+"comment/add_comment/",
+            url: baseUrl+"index.php/comment/add_comment/",
             dataType: "json",
             data: {
                 'comment' : comment_text,
                 'post_id': getpID
             },
             success: function(response){
-                $('#CommentPosted'+getpID).append($('<div id="record-'+ response.comment_id+'" class="commentPanel" align="left" style=" border-left: 3px solid #5890FF;"><img class="comment-img" alt="" src="http://localhost/cygnite/assets/img/small_comment.jpg"> <span class="postedComments">'+response.comment+' </span><div id="comment-delete-'+response.comment_id+'" class="comment-delete trash-button"  onclick="deleteComment('+response.comment_id+')">X</div><br clear="all"><span style="margin-left:43px; color:#666666; font-size:11px"> few seconds ago </span></div>').fadeIn('slow'));
+                $('#CommentPosted'+getpID).append($('<div id="record-'+ response.comment_id+'" class="commentPanel" align="left" style=" border-left: 3px solid #5890FF;"><img class="comment-img" alt="" src="'+baseUrl+'"/assets/img/small_comment.jpg"> <span class="postedComments">'+response.comment+' </span><div id="comment-delete-'+response.comment_id+'" class="comment-delete trash-button"  onclick="deleteComment('+response.comment_id+')">X</div><br clear="all"><span style="margin-left:43px; color:#666666; font-size:11px"> few seconds ago </span></div>').fadeIn('slow'));
                 $("#comment-panel-div-"+getpID).val("").attr("placeholder", "Write a comment...");
             }
         });
@@ -44,7 +43,7 @@ function deleteComment(id)
         return false;
     $.ajax({
         type: 'post',
-        url: baseUrl+"comment/delete-comment/",
+        url: baseUrl+"index.php/comment/delete-comment/",
         data: {
             'id' : id
         },
@@ -66,7 +65,7 @@ function deletePost(id)
 		
     $.ajax({
         type: 'post',
-        url: baseUrl+"comment/delete/",
+        url: baseUrl+"index.php/comment/delete/",
         data: {
             'id' : id
         },
@@ -86,7 +85,7 @@ function getSiteContent(url)
 
     $.ajax({
         type: 'post',
-        url: baseUrl+"comment/web-scrap/",
+        url: baseUrl+"index.php/comment/web-scrap/",
         data: { 'url' : url  },
         beforeSend: function(){
         },
@@ -113,12 +112,12 @@ $(function() {
         var Id =  $(this).attr('id');
         $("a.more_records").hide();
 		
-        $("#load-more-bottom").html("<img src='"+baseUrl+"assets/img/fb_loading.gif'/>");
+        $("#load-more-bottom").html("<img src='"+baseUrl+"/assets/img/fb_loading.gif'/>");
         $.ajax({
             type: 'post',
             dataType: 'json',
             cache: false,
-            url: baseUrl+"comment/show-more/",
+            url: baseUrl+"index.php/comment/show-more/",
             data: {'limit' : Id.replace('more_','')},
             success: function(response) {
                   $("a.more_records").show();
@@ -151,7 +150,7 @@ $(function() {
             $.ajax({
                 type: 'post',
                 dataType: 'json',
-                url: baseUrl+"comment/post/",
+                url: baseUrl+"index.php/comment/post/",
                 data: {
                     'value' : value
                 },
@@ -160,7 +159,7 @@ $(function() {
                     var htmlString = '';
 
                     htmlString = '<div id="record-'+response.id+'" class="friends_area">\n\
-                            <img alt="" style="float:left;" src="http://localhost/cygnite/assets/img/sanjoy_profile_post.jpg">\n\
+                            <img alt="" style="float:left;" src="'+baseUrl+'/assets/img/sanjoy_profile_post.jpg">\n\
                             <label class="name" style="float:left">\n\n\
                                 <b> '+response.name+'</b> \n\
                                <em>'+response.post+' </em><br clear="all"> \n\
@@ -170,7 +169,7 @@ $(function() {
                     htmlString += '<div style="float:right;" id="delete-id-'+response.id+'" class="delete trash-button" onclick="deletePost("'+response.id+'");"> X</div> <br clear="all"><div id="CommentPosted'+response.id+'"></div>';
 
                     htmlString +=  '<div align="left" style="display:none;" id="comment-wrapper-'+response.id+'" class="comment-wrapper">\n\
-                                       <img width="40" alt="" style="float:left;" class="comment-img" src="http://localhost/cygnite/assets/img/small_comment.jpg"> \n\
+                                       <img width="40" alt="" style="float:left;" class="comment-img" src="'+baseUrl+'/assets/img/small_comment.jpg"> \n\
                                          <div id="record-'+response.id+'"><textarea placeholder="What\'s on your mind?" cols="60" name="comment-panel-div" id="comment-panel-div-'+response.id+'" class="comment-panel-div"></textarea>\n\
                                        </div><p clear="all"> </p> <a style="float:right;display:none;" class="btn-primary button comment" id="submit-comment" onclick="submit-comment();"> Comment</a>\n\
                                        <div style="clear:both;"> </div> \n\
