@@ -11,11 +11,12 @@ function displayCommentBox(id)
     $("#comment-wrapper-"+id).children("a#submit-comment").show();
 }
 
-function submitComment()
+function submitComment(id)
 {
-    var getpID =  $("a.comment").parent().parent().attr('id').replace('comment-wrapper-','');
+   // var getpID =  $("a.comment").parent().parent().attr('id').replace('comment-wrapper-','');
+    var getpID =  id;
     var comment_text = $("#comment-panel-div-"+getpID).val();
-	
+	//console.log(comment_text);
     if(comment_text != '' )
     {
         $.ajax({
@@ -27,7 +28,7 @@ function submitComment()
                 'post_id': getpID
             },
             success: function(response){
-                $('#CommentPosted'+getpID).append($('<div id="record-'+ response.comment_id+'" class="commentPanel" align="left" style=" border-left: 3px solid #5890FF;"><img class="comment-img" alt="" src="'+baseUrl+'"/assets/img/small_comment.jpg"> <span class="postedComments">'+response.comment+' </span><div id="comment-delete-'+response.comment_id+'" class="comment-delete trash-button"  onclick="deleteComment('+response.comment_id+')">X</div><br clear="all"><span style="margin-left:43px; color:#666666; font-size:11px"> few seconds ago </span></div>').fadeIn('slow'));
+                $('#CommentPosted'+getpID).append($('<div id="record-'+ response.comment_id+'" class="commentPanel" align="left" style=" border-left: 3px solid #5890FF;"><img class="comment-img" alt="" src="'+baseUrl+'/assets/img/small_comment.jpg"> <span class="postedComments">'+response.comment+' </span><div id="comment-delete-'+response.comment_id+'" class="comment-delete trash-button"  onclick="deleteComment('+response.comment_id+')">X</div><br clear="all"><span style="margin-left:43px; color:#666666; font-size:11px"> few seconds ago </span></div>').fadeIn('slow'));
                 $("#comment-panel-div-"+getpID).val("").attr("placeholder", "Write a comment...");
             }
         });
@@ -59,6 +60,7 @@ function deleteComment(id)
 
 function deletePost(id)
 {
+    var Id = $.trim(id);
 
     if(confirm('Are you sure you want to delete this post?')==false)
         return false;
@@ -67,13 +69,13 @@ function deletePost(id)
         type: 'post',
         url: baseUrl+"index.php/comment/delete/",
         data: {
-            'id' : id
+            'id' : Id
         },
         beforeSend: function(){
         },
         success: function(){
 		
-            $("#record-"+id).fadeOut(300, function(){
+            $("#record-"+Id).fadeOut(300, function(){
                 $(this).remove();
             });
         }
@@ -107,12 +109,12 @@ $(function() {
     });
 
     //more records show
-    $('a.more_records').on("click", function(e){
+    $(document).on("click", 'a.more_records', function(e){
 
         var Id =  $(this).attr('id');
         $("a.more_records").hide();
 		
-        $("#load-more-bottom").html("<img src='"+baseUrl+"/assets/img/fb_loading.gif'/>");
+        $("#load-more-bottom").html("<img class='loading-img' src='"+baseUrl+"/assets/img/fb_loading.gif'/>");
         $.ajax({
             type: 'post',
             dataType: 'json',
@@ -121,11 +123,16 @@ $(function() {
             data: {'limit' : Id.replace('more_','')},
             success: function(response) {
                   $("a.more_records").show();
+//console.log(response.posts.length);
                 if (response.posts.length != 0) {
                     var nextNumber = Number(Id.replace('more_','')) + Number(response.count);
+//console.log(nextNumber);
+
                     $("a.more_records").attr('id', 'more_'+nextNumber);
                     $('#posting').append($(response.posts).fadeIn('slow'));
-                    $("#load-more-bottom").html("");
+                    $(".loading-img").hide();
+                    $("#load-more-bottom").html('<a href="javascript: void(0)" class="more_records" id="more_'+nextNumber+'">Older Posts</a>');
+                    
                 } else {
                     $('#load-more-bottom').remove();
                 }
@@ -143,16 +150,18 @@ $(function() {
     });
 
     $('#shareButton').click(function(){
-        var value = $("#post-share-box").val();
+        var postValue = $("#post-share-box").val();
 
-        if(value != "" )
+        if(postValue != "" )
         {
+console.log(postValue);
+
             $.ajax({
                 type: 'post',
                 dataType: 'json',
                 url: baseUrl+"index.php/comment/post/",
                 data: {
-                    'value' : value
+                    'comment' : postValue
                 },
                 success: function(response){
 
@@ -166,16 +175,16 @@ $(function() {
                               <span>few seconds ago </span> \n\
                             <a onclick="displayCommentBox('+response.id+'); " class="showCommentBox" id="post_id'+response.id+'" href="javascript: void(0)">Comments</a>\n\
                             </label>';
-                    htmlString += '<div style="float:right;" id="delete-id-'+response.id+'" class="delete trash-button" onclick="deletePost("'+response.id+'");"> X</div> <br clear="all"><div id="CommentPosted'+response.id+'"></div>';
+
+                    htmlString += '<div style="float:right;" id="delete-id-'+response.id+'" class="delete trash-button" onclick="deletePost('+$.trim(response.id)+');"> X</div> <br clear="all"><div id="CommentPosted'+response.id+'"></div>';
 
                     htmlString +=  '<div align="left" style="display:none;" id="comment-wrapper-'+response.id+'" class="comment-wrapper">\n\
                                        <img width="40" alt="" style="float:left;" class="comment-img" src="'+baseUrl+'/assets/img/small_comment.jpg"> \n\
                                          <div id="record-'+response.id+'"><textarea placeholder="What\'s on your mind?" cols="60" name="comment-panel-div" id="comment-panel-div-'+response.id+'" class="comment-panel-div"></textarea>\n\
-                                       </div><p clear="all"> </p> <a style="float:right;display:none;" class="btn-primary button comment" id="submit-comment" onclick="submit-comment();"> Comment</a>\n\
+                                       </div><p clear="all"> </p> <a style="float:right;display:none;" class="btn-primary button comment" id="submit-comment" onclick="submitComment('+response.id+');"> Comment</a>\n\
                                        <div style="clear:both;"> </div> \n\
                                       </div>\n\
                                       </div>';
-
 
                     $('#posting').prepend($(htmlString).fadeIn('slow'));
                     $("#post-share-box").val("").attr("placeholder", "Write a comment...");
@@ -188,4 +197,4 @@ $(function() {
         }
     });
 
-});
+});	

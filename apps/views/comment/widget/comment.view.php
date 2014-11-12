@@ -74,7 +74,7 @@ use Apps\Models\FacebookPostsComments as FBComment;
                 <div id="record-<?php echo $post->p_id; ?>">
                     <textarea class="comment-panel-div" id="comment-panel-div-<?php echo $post->p_id; ?>" name="comment-panel-div" cols="60" placeholder="What's on your mind?"></textarea>
                 </div>
-                <p clear="all" > <a id="submit-comment" class="btn-primary button comment" style="float:right;display:none;" onclick="submitComment();"> Comment</a></p>
+                <p clear="all" > <a id="submit-comment" class="btn-primary button comment" style="float:right;display:none;" onclick="submitComment(<?php echo $post->p_id; ?>);"> Comment</a></p>
 
                 <div style="clear:both;"> </div>
             </div>
